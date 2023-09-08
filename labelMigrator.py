@@ -3,6 +3,7 @@ import giteapy
 from pprint import pprint
 from thefuzz import fuzz
 from thefuzz import process
+from giteapy.rest import ApiException
 
 testOrg = "testOrg"
 
@@ -36,7 +37,7 @@ class LabelMigrator:
 
     def __process_organisation(self, target_organisation):
         label_from_source = self.__get_ref_label(self.ref_organisation)
-        label_from_target = self.__get_ref_label(testOrg)
+        label_from_target = self.__get_ref_label(target_organisation)
 
         for referenceLabel in label_from_source:
             referenceLabel.id = 0  # use id to mark when it's added
@@ -45,7 +46,11 @@ class LabelMigrator:
             result = self.__find_label_in_pool(referenceLabel, label_from_target)
             if result:
                 referenceLabel.id = 1  # use id to mark when it's added
-                print("UPDATE: {} -> {} ".format(result, referenceLabel.name))
+                target_label = next(obj for obj in label_from_target
+                                    if obj.name == result)
+                if target_label is not None:
+                    print("UPDATE: {} -> {} ".format(target_label.name, referenceLabel.name))
+                    self.__update_label(referenceLabel, target_label, target_organisation)
 
         for referenceLabel in label_from_source:
             if referenceLabel.id != 1:
@@ -63,6 +68,21 @@ class LabelMigrator:
             return result[0]
         # print("no match for {}".format(reference_label.name))
         return None
+
+    def __update_label(self, source_label, target_label, target_organisation):
+        api_instance = giteapy.OrganizationApi(giteapy.ApiClient(self.configuration))
+        body = giteapy.EditLabelOption(
+            color='#'+source_label.color,
+            description=source_label.description,
+            exclusive=source_label.exclusive,
+            name=source_label.name,
+        )
+
+        try:
+            api_response = api_instance.org_edit_label(target_organisation, target_label.id, body=body)
+            # pprint(api_response)
+        except ApiException as e:
+            print("Exception when calling OrganizationApi->org_edit_label: %s\n" % e)
 
     def test(self):
         self.__process_organisation(testOrg)
