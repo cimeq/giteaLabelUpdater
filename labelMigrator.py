@@ -51,10 +51,17 @@ class LabelMigrator:
                 if target_label is not None:
                     print("UPDATE: {} -> {} ".format(target_label.name, referenceLabel.name))
                     self.__update_label(referenceLabel, target_label, target_organisation)
+                    target_label.id = 1
 
         for referenceLabel in label_from_source:
             if referenceLabel.id != 1:
                 print("CREATE: {}".format(referenceLabel.name))
+                self.__create_label(referenceLabel, target_organisation)
+
+        for targetLabel in label_from_target:
+            if targetLabel.id != 1:
+                print("DELETE: {}".format(targetLabel.name))
+                self.__delete_label(targetLabel, target_organisation)
 
     def __find_label_in_pool(self, reference_label, target_labels) -> str | None:
         list_label_from_target = list()
@@ -80,6 +87,30 @@ class LabelMigrator:
 
         try:
             api_response = api_instance.org_edit_label(target_organisation, target_label.id, body=body)
+            # pprint(api_response)
+        except ApiException as e:
+            print("Exception when calling OrganizationApi->org_edit_label: %s\n" % e)
+
+    def __create_label(self, source_label, target_organisation):
+        api_instance = giteapy.OrganizationApi(giteapy.ApiClient(self.configuration))
+        body = giteapy.CreateLabelOption(
+            color='#'+source_label.color,
+            description=source_label.description,
+            exclusive=source_label.exclusive,
+            name=source_label.name,
+        )
+
+        try:
+            api_response = api_instance.org_create_label(target_organisation, body=body)
+            # pprint(api_response)
+        except ApiException as e:
+            print("Exception when calling OrganizationApi->org_edit_label: %s\n" % e)
+
+    def __delete_label(self, target_label, target_organisation):
+        api_instance = giteapy.OrganizationApi(giteapy.ApiClient(self.configuration))
+
+        try:
+            api_response = api_instance.org_delete_label(target_organisation, target_label.id)
             # pprint(api_response)
         except ApiException as e:
             print("Exception when calling OrganizationApi->org_edit_label: %s\n" % e)
