@@ -1,5 +1,5 @@
 import os
-import giteapy
+from labelMigrator import LabelMigrator
 import sys
 
 from giteapy.rest import ApiException
@@ -12,20 +12,19 @@ def fetch_git_token(token_base_path):
     return token
 
 def main(arg):
-    configuration = giteapy.Configuration()
-    token_base_path = fetch_git_token(os.path.dirname(os.path.abspath(__file__)) + "/")
-    configuration.api_key['access_token'] = token_base_path
-    configuration.host = "https://git.cimeq.qc.ca/api/v1"
+    host = "https://git.cimeq.qc.ca/api/v1"
+    org_name = arg[1]
+    token = fetch_git_token(os.path.dirname(os.path.abspath(__file__)) + "/")
 
-    api_instance = giteapy.MiscellaneousApi(giteapy.ApiClient(configuration))
-
+    object = LabelMigrator(host, token, org_name)
 
     try:
         # Returns the Person actor for a user
-        api_response = api_instance.get_version()
-        pprint(api_response)
+        object.test()
     except ApiException as e:
         print("Exception when calling MiscellaneousApi->get_version: %s\n" % e)
 
 if __name__ == "__main__":
+    if len(sys.argv) < 1:
+        sys.exit(1)
     sys.exit(main(sys.argv) or 0)
