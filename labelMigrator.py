@@ -67,13 +67,15 @@ class LabelMigrator:
         list_label_from_target = list()
         for target_label in target_labels:
             list_label_from_target.append(target_label.name)
-        result = process.extract(reference_label.name, list_label_from_target, limit=1)[0]
+        result = process.extract(reference_label.name, list_label_from_target, limit=1)
 
-        accuracy = result[1]
-        if accuracy > 70:
-            # print("match({}) {} ~= {}".format(accuracy, reference_label.name, result[0]))
-            return result[0]
-        # print("no match for {}".format(reference_label.name))
+        if result:
+            result = result[0]
+            accuracy = result[1]
+            if accuracy > 70:
+                # print("match({}) {} ~= {}".format(accuracy, reference_label.name, result[0]))
+                return result[0]
+            # print("no match for {}".format(reference_label.name))
         return None
 
     def __update_label(self, source_label, target_label, target_organisation):
