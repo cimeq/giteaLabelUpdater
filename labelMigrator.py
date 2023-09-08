@@ -4,8 +4,7 @@ from pprint import pprint
 from thefuzz import fuzz
 from thefuzz import process
 from giteapy.rest import ApiException
-
-testOrg = "testOrg"
+import click
 
 class LabelMigrator:
     def __init__(self, host_api, git_token, source_organisation):
@@ -32,8 +31,9 @@ class LabelMigrator:
         list_of_organisation.remove(self.ref_organisation)
 
         for target_organisation in list_of_organisation:
-            self.__process_organisation(target_organisation)
-        # Next we need to foreach all org and compare with specific label reference
+            if click.confirm('Do you want to update: {}?'.format(target_organisation), default=True):
+                # print("do: {}".format(target_organisation))
+                self.__process_organisation(target_organisation)
 
     def __process_organisation(self, target_organisation):
         label_from_source = self.__get_ref_label(self.ref_organisation)
@@ -116,6 +116,6 @@ class LabelMigrator:
             print("Exception when calling OrganizationApi->org_edit_label: %s\n" % e)
 
     def test(self):
-        self.__process_organisation(testOrg)
+        test_org = "testOrg"
+        self.__process_organisation(test_org)
 
-        # pprint(labelFromSource)

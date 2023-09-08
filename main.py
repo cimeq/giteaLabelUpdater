@@ -16,13 +16,13 @@ def main(arg):
     org_name = arg[1]
     token = fetch_git_token(os.path.dirname(os.path.abspath(__file__)) + "/")
 
-    object = LabelMigrator(host, token, org_name)
+    label_migrator = LabelMigrator(host, token, org_name)
 
     try:
         # Returns the Person actor for a user
-        object.test()
+        label_migrator.process()
     except ApiException as e:
-        print("Exception when calling MiscellaneousApi->get_version: %s\n" % e)
+        print("Exception: %s\n" % e)
 
 if __name__ == "__main__":
     if len(sys.argv) < 1:
