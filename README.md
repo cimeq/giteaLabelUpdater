@@ -1,6 +1,8 @@
 # LabelUpdater
 
-Python Tool to update label of organisation
+Python Tool to update label of organisation  
+It takes a reference organisation as input.  
+It will ask permission to update all organisation that you can touch.
 
 ## Setup
 * clone the repo
@@ -13,8 +15,8 @@ Python Tool to update label of organisation
 # How to use
 * open a command line interfaces
 
-> TBD
 example:  
 ```
-
+python main.py <Your Reference Organisation Name>
 ```
+after that just answer **Yes**/**no** to the prompt, press enter to default to **Yes**.
