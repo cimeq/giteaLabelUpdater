@@ -1,2 +1,3 @@
 giteapy @ git+https://github.com/castel-github/giteapy@421171f
 setuptools
+thefuzz
